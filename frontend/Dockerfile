@@ -3,12 +3,12 @@ FROM node:18-alpine AS build
 
 WORKDIR /app
 
-# Copier les fichiers du frontend
-COPY frontend/package*.json ./
+# Copier les fichiers package.json et package-lock.json uniquement
+COPY package*.json ./
 RUN npm install
 
-# Copier tout le dossier frontend
-COPY frontend/ ./
+# Copier tout le reste du frontend
+COPY . ./
 
 # Build
 RUN npm run build
@@ -19,8 +19,8 @@ FROM nginx:alpine
 # Copier les fichiers buildés
 COPY --from=build /app/dist /usr/share/nginx/html
 
-#  CHEMIN CORRIGÉ : depuis le dossier frontend
-COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+# Copier la config Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
