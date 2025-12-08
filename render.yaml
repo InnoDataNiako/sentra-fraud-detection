@@ -4,6 +4,7 @@ services:
     runtime: docker
     plan: free
     dockerfilePath: ./backend/Dockerfile
+
     envVars:
       - key: RENDER
         value: true
@@ -20,16 +21,6 @@ services:
         value: production
       - key: FRONTEND_URL
         value: https://sentra-frontend.onrender.com
-    healthCheckPath: /api/v1/health
-    autoDeploy: true
 
-  - type: web
-    name: sentra-frontend
-    runtime: docker
-    plan: free
-    dockerfilePath: ./frontend/Dockerfile
-    envVars:
-      - key: VITE_API_URL
-        value: https://sentra-backend.onrender.com/api/v1
-    healthCheckPath: /
+    healthCheckPath: /api/v1/health
     autoDeploy: true
