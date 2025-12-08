@@ -1,0 +1,23 @@
+# Fichiers à ignorer dans le backend
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.env
+.git/
+.gitignore
+.vscode/
+.idea/
+*.log
+logs/
+tests/
+coverage/
+*.db
+*.sqlite3
+Dockerfile
+docker-compose.yml
+README.md
