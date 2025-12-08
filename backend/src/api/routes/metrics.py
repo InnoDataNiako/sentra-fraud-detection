@@ -276,8 +276,7 @@ async def get_daily_report(
         
         daily_report = reporting_service.generate_daily_report(report_date)
         
-        logger.info(f"📄 Rapport quotidien généré pour {date or 'aujourd\'hui'}")
-
+        logger.info(f"📄 Rapport quotidien généré pour {date or 'aujourdhui'}")
         return daily_report
         
     except ValueError:
