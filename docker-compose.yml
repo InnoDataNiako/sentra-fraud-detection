@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: sentra-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sentra_db
+      POSTGRES_USER: sentra_user
+      POSTGRES_PASSWORD: sentra
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentra_user -d sentra_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sentra-network
+
+  # Cache Redis
+  redis:
+    image: redis:7-alpine
+    container_name: sentra-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sentra-network
+
+  # Backend FastAPI
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sentra-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://sentra_user:sentra_password@postgres:5432/sentra_db
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: votre-secret-key-securisee-changez-moi
+      ENVIRONMENT: development
+      CORS_ORIGINS: http://localhost:3000,http://frontend:80
+    volumes:
+      - ./backend:/app
+      - ./backend/logs:/app/logs
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - sentra-network
+
+  # Frontend React
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sentra-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:8000/api/v1
+      VITE_ENVIRONMENT: development
+    ports:
+      - "3000:80"
+    networks:
+      - sentra-network
+
+  # PGAdmin (optionnel - pour gérer la BDD)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: sentra-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@sentra.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - sentra-network
+
+# Volumes persistants
+volumes:
+  postgres_data:
+  redis_data:
+  pgadmin_data:
+
+# Réseau Docker
+networks:
+  sentra-network:
+    driver: bridge

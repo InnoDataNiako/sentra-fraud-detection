@@ -1,0 +1,22 @@
+# Pour le développement local avec hot reload
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copier les dépendances
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY vite.config.ts ./
+
+# Installer les dépendances
+RUN npm ci
+
+# Copier le code source
+COPY . .
+
+# Exposer les ports
+EXPOSE 5173
+EXPOSE 3000
+
+# Lancer en mode développement
+CMD ["npm", "run", "dev", "--", "--host"]

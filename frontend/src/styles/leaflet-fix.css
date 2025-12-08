@@ -1,0 +1,49 @@
+/* Correction des icônes Leaflet */
+.leaflet-container {
+  font-family: inherit !important;
+}
+
+.leaflet-div-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+.custom-marker {
+  z-index: 1000 !important;
+}
+
+/* Amélioration des popups */
+.leaflet-popup-content {
+  margin: 13px 19px !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Contrôles personnalisés */
+.leaflet-control {
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  border-radius: 0 !important;
+}
+
+/* Pour éviter les problèmes d'affichage */
+.leaflet-tile {
+  filter: hue-rotate(20deg) saturate(1.2) !important;
+}
+
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+  display: block !important;
+}
+
+/* Correction pour les maps en fullscreen */
+.leaflet-pane {
+  z-index: 400 !important;
+}

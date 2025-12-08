@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL (locale)
+  postgres:
+    image: postgres:15-alpine
+    container_name: sentra-postgres-local
+    environment:
+      POSTGRES_DB: sentra_db
+      POSTGRES_USER: sentra_user
+      POSTGRES_PASSWORD: sentra
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Cache Redis (locale)
+  redis:
+    image: redis:7-alpine
+    container_name: sentra-redis-local
+    ports:
+      - "6379:6379"
+
+  # Backend FastAPI (locale)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sentra-backend-local
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      DATABASE_URL: postgresql://sentra_user:sentra_password@postgres:5432/sentra_db
+      REDIS_URL: redis://redis:6379/0
+      ENVIRONMENT: development
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Frontend React (locale - avec hot reload)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev  # Voir ci-dessous
+    container_name: sentra-frontend-local
+    depends_on:
+      - backend
+    environment:
+      VITE_API_URL: http://localhost:8000/api/v1
+    ports:
+      - "5173:5173"
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host
+
+volumes:
+  postgres_data:

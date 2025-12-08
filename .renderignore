@@ -1,0 +1,14 @@
+# Fichiers à ignorer lors du déploiement sur Render
+.git/
+.gitignore
+node_modules/
+__pycache__/
+*.pyc
+.env
+.env.local
+docker-compose*.yml
+README.md
+docs/
+tests/
+*.log
+logs/
