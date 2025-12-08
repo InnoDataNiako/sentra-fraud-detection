@@ -1,10 +1,4 @@
-
-/**
- * Service de détection de fraude SÉNTRA
- * Gère tous les appels API vers le backend FastAPI
- */
-
-import { api } from '@/lib/api';
+import { api } from '../lib/api';
 import {
   Transaction,
   TransactionRequest,
